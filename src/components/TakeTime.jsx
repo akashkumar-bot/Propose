@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { ChevronDown, Heart } from "lucide-react";
 
+const takeTimePath = (choice) => {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return `${base}/take-time${choice ? `?choice=${encodeURIComponent(choice)}` : ""}`;
+};
+
 export default function TakeTime({ onBack, selectedChoice }) {
   const [selected, setSelected] = useState(selectedChoice);
   const choose = (value) => {
     setSelected(value);
-    window.history.replaceState(
-      {},
-      "",
-      `/take-time?choice=${encodeURIComponent(value)}`,
-    );
+    window.history.replaceState({}, "", takeTimePath(value));
   };
   const chooseAnother = () => {
     setSelected(null);
-    window.history.replaceState({}, "", "/take-time");
+    window.history.replaceState({}, "", takeTimePath());
   };
   const messages = {
     later: [

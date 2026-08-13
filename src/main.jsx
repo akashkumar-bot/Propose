@@ -13,8 +13,22 @@ import Accepted from "./components/Accepted";
 import TakeTime from "./components/TakeTime";
 import { bootLines, TOTAL_SCENES } from "./constants";
 
+const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Keep application routes independent from the hosting subdirectory.
+const appPath = (path = window.location.pathname) => {
+  const relativePath =
+    BASE_PATH && path.startsWith(BASE_PATH)
+      ? path.slice(BASE_PATH.length)
+      : path;
+  return relativePath || "/";
+};
+
+const hostedPath = (path) => `${BASE_PATH}${path}` || "/";
+
 // Convert a URL such as /scene/3 into the scene number used by the app.
 const sceneFromPath = (pathname) => {
+  pathname = appPath(pathname);
   if (pathname === "/accepted" || pathname === "/take-time") return 6;
   const match = pathname.match(/\/scene\/(\d+)/);
   return match ? Math.min(5, Math.max(1, Number(match[1]))) : 1;
@@ -24,30 +38,28 @@ function App() {
   const initialChoice = new URLSearchParams(window.location.search).get(
     "choice",
   );
-  const [started, setStarted] = useState(
-    () => window.location.pathname !== "/",
-  );
-  const [booted, setBooted] = useState(
-    () =>
-      window.location.pathname.startsWith("/scene/") ||
-      window.location.pathname === "/accepted" ||
-      window.location.pathname === "/take-time",
-  );
+  const [started, setStarted] = useState(() => appPath() !== "/");
+  const [booted, setBooted] = useState(() => {
+    const path = appPath();
+    return (
+      path.startsWith("/scene/") ||
+      path === "/accepted" ||
+      path === "/take-time"
+    );
+  });
   const [line, setLine] = useState(0);
-  const [scene, setScene] = useState(() =>
-    sceneFromPath(window.location.pathname),
-  );
+  const [scene, setScene] = useState(() => sceneFromPath(appPath()));
   const [answer, setAnswer] = useState(() =>
-    window.location.pathname === "/accepted"
+    appPath() === "/accepted"
       ? "yes"
-      : window.location.pathname === "/take-time"
+      : appPath() === "/take-time"
         ? "time"
         : null,
   );
   const [timeChoice, setTimeChoice] = useState(initialChoice);
   const startExperience = () => {
     setStarted(true);
-    window.history.pushState({}, "", "/boot");
+    window.history.pushState({}, "", hostedPath("/boot"));
     document.documentElement.requestFullscreen?.().catch(() => {});
   };
   useEffect(() => {
@@ -61,13 +73,13 @@ function App() {
     }
     const timer = setTimeout(() => {
       setBooted(true);
-      window.history.replaceState({}, "", "/scene/1");
+      window.history.replaceState({}, "", hostedPath("/scene/1"));
     }, 1100);
     return () => clearTimeout(timer);
   }, [line, started]);
   useEffect(() => {
     const onPopState = () => {
-      const path = window.location.pathname;
+      const path = appPath();
       if (path === "/accepted") {
         setAnswer("yes");
         setScene(6);
@@ -99,7 +111,7 @@ function App() {
   const go = (next) => {
     setAnswer(null);
     setScene(next);
-    window.history.pushState({}, "", `/scene/${next}`);
+    window.history.pushState({}, "", hostedPath(`/scene/${next}`));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const answerProposal = (value, choice = null) => {
@@ -109,9 +121,11 @@ function App() {
     window.history.pushState(
       {},
       "",
-      value === "yes"
-        ? "/accepted"
-        : `/take-time${choice ? `?choice=${encodeURIComponent(choice)}` : ""}`,
+      hostedPath(
+        value === "yes"
+          ? "/accepted"
+          : `/take-time${choice ? `?choice=${encodeURIComponent(choice)}` : ""}`,
+      ),
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

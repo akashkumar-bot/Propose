@@ -113,6 +113,8 @@ Most layout and spacing styles are written as Tailwind utility classes directly 
 
 The included `vercel.json` rewrites every route to `index.html`, allowing direct visits and refreshes on client-side routes.
 
+For GitHub Pages, the deployment workflow supplies `/Propose/` as the production base path. Local development and root-domain deployments continue to use `/`. The workflow builds the Vite app and deploys the generated `dist` directory.
+
 To deploy on Vercel:
 
 1. Import the repository into Vercel.

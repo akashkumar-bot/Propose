@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Check, Heart, ArrowRight } from "lucide-react";
 
+const acceptedPath = (step) =>
+  `${import.meta.env.BASE_URL.replace(/\/$/, "")}/accepted?step=${step}`;
+
 export default function Accepted() {
   const [step, setStep] = useState(() =>
     Math.min(
@@ -18,7 +21,7 @@ export default function Accepted() {
   const next = () => {
     const value = Math.min(3, step + 1);
     setStep(value);
-    window.history.pushState({}, "", `/accepted?step=${value}`);
+    window.history.pushState({}, "", acceptedPath(value));
   };
   useEffect(() => {
     if (step !== 3 || countdown <= 0) return;
