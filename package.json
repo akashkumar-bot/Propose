@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --port 3000",
     "build": "vite build",
+    "build:pages": "VITE_BASE_PATH=/Propose/ vite build && cp dist/index.html dist/404.html",
+    "deploy": "npm run build:pages && gh-pages -d dist",
     "preview": "vite preview --port 3000",
     "format": "prettier --write src index.html vite.config.js"
   },
@@ -18,6 +20,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "gh-pages": "^6.3.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3"
   }

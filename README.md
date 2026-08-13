@@ -45,6 +45,14 @@ Create a production build:
 npm run build
 ```
 
+Deploy the current project manually to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+This command builds the app with the `/Propose/` base path and publishes the `dist` directory to the `gh-pages` branch.
+
 Preview the production build locally:
 
 ```bash
